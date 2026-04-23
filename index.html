@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Event Registration</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+:root{
+  --accent:#22c55e;
+  --bg:#f9fafb;
+  --ink:#111827;
+  --danger:#dc2626;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body{
+  font-family: "Inter", sans-serif;
+  background: linear-gradient(135deg,#f8fafc,#e8f5e9);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
+  padding:20px;
+}
+
+.container{
+  width:100%;
+  max-width:500px;
+  background:white;
+  padding:25px;
+  border-radius:18px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.08);
+}
+
+h2{text-align:center;margin-bottom:10px;}
+p{text-align:center;color:#6b7280;font-size:13px;margin-bottom:15px;}
+
+.input-wrap{position:relative;margin-bottom:12px;}
+.input-wrap i{
+  position:absolute;top:50%;left:12px;transform:translateY(-50%);
+  color:#9ca3af;
+}
+
+input,select{
+  width:100%;
+  padding:0.5rem 2rem;
+  border-radius:10px;
+  border:1px solid #ddd;
+}
+
+.radio-group{display:flex;gap:10px;margin-bottom:10px;}
+.radio-group input{display:none;}
+.radio-group label{
+  flex:1;text-align:center;padding:10px;
+  border:1px solid #ddd;border-radius:10px;cursor:pointer;
+}
+.radio-group input:checked + label{
+  background:#ecfdf5;border-color:var(--accent);
+}
+
+.qr{text-align:center;margin:10px 0;}
+.qr img{width:140px;}
+
+button{
+  width:100%;padding:12px;border:none;border-radius:10px;
+  margin-top:10px;font-weight:600;cursor:pointer;
+}
+
+.pay{background:var(--accent);color:white;}
+.submit{background:#111827;color:white;}
+.submit:disabled{opacity:0.5;}
+.download{background:#2563eb;color:white;}
+
+.status{
+  margin-top:10px;
+  min-height:18px;
+  text-align:center;
+  font-size:13px;
+  color:#6b7280;
+}
+
+.status.error{color:#dc2626;}
+
+.status.success{color:#166534;}
+
+.total{
+  text-align:center;
+  font-weight:600;
+  margin-top:8px;
+}
+
+.file-upload {
+  position: relative;
+  width: 100%;
+  margin: 1rem 0rem;
+}
+
+.file-upload input {
+  display: none;
+}
+
+.file-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border: 1.5px dashed #d1d5db;
+  border-radius: 12px;
+  background: #f9fafb;
+  cursor: pointer;
+  font-size: 14px;
+  color: #374151;
+  transition: all 0.2s ease;
+}
+
+.file-label i {
+  color: #9ca3af;
+  font-size: 16px;
+}
+
+.file-label:hover {
+  border-color: #22c55e;
+  background: #ecfdf5;
+  color: #166534;
+}
+
+.file-label.active {
+  border-color: #22c55e;
+  background: #ecfdf5;
+  color: #166534;
+}
+
+.file-preview {
+  display: none;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.file-preview.visible {
+  display: block;
+}
+
+.file-preview img {
+  width: 100%;
+  max-width: 220px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  object-fit: cover;
+}
+
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Event Registration</h2>
+<p>Complete your registration and payment</p>
+
+<form id="form">
+
+<div class="input-wrap">
+<i class="fa fa-user"></i>
+<input type="text" id="name" placeholder="Full Name" required>
+</div>
+
+<div class="input-wrap">
+<i class="fa fa-phone"></i>
+<input type="tel" id="phone" placeholder="Phone" required>
+</div>
+
+<div class="input-wrap">
+<i class="fa fa-envelope"></i>
+<input type="email" id="email" placeholder="Email" required>
+</div>
+
+<div class="radio-group">
+<input type="radio" id="veg" name="food" value="Veg" checked>
+<label for="veg">Veg</label>
+
+<input type="radio" id="nonveg" name="food" value="Non-Veg">
+<label for="nonveg">Non-Veg</label>
+</div>
+
+<!-- Ticket Count -->
+<div class="input-wrap">
+<i class="fa fa-ticket"></i>
+<select id="tickets">
+  <option value="1">1 Ticket</option>
+  <option value="2">2 Tickets</option>
+  <option value="3">3 Tickets</option>
+  <option value="4">4 Tickets</option>
+  <option value="5">5 Tickets</option>
+  <option value="6">6 Tickets</option>
+  <option value="7">7 Tickets</option>
+  <option value="8">8 Tickets</option>
+  <option value="9">9 Tickets</option>
+  <option value="10">10 Tickets</option>
+</select>
+</div>
+
+<div class="total" id="total">Total: ₹100</div>
+
+<!-- QR -->
+<div class="qr">
+<img id="qrImg" src="">
+</div>
+
+<button type="button" class="pay" id="payBtn">
+<i class="fa fa-qrcode"></i> Pay via GPay
+</button>
+
+<!-- Image Upload -->
+<div class="file-upload">
+  <label for="proof" class="file-label">
+    <i class="fa fa-image"></i>
+    <span id="fileText">Upload Payment Screenshot</span>
+  </label>
+  <input type="file" id="proof" accept="image/*">
+</div>
+
+<div class="file-preview" id="filePreview">
+  <img id="previewImg" alt="Selected payment screenshot preview">
+</div>
+
+<button class="submit" id="submitBtn" type="submit">Submit</button>
+
+<button type="button" class="download" onclick="downloadCSV()">
+Download CSV
+</button>
+
+<div class="status" id="status"></div>
+
+</form>
+</div>
+
+<script>
+
+const pricePerTicket = 100;
+
+let data = JSON.parse(localStorage.getItem("registrations")) || [];
+
+const tickets = document.getElementById("tickets");
+const total = document.getElementById("total");
+const qrImg = document.getElementById("qrImg");
+const payBtn = document.getElementById("payBtn");
+const proof = document.getElementById("proof");
+const submitBtn = document.getElementById("submitBtn");
+const statusEl = document.getElementById("status");
+const filePreview = document.getElementById("filePreview");
+const previewImg = document.getElementById("previewImg");
+
+const googleSheetWebAppUrlDefault = "https://script.google.com/macros/s/AKfycbyCD_Wu_Pjhd8jsEz_V9dkm7bQh-CICgHODDcykD8dQqfGGM0HBm5Topt-auU9gkTgB/exec";
+const googleSheetWebAppUrlKey = "google_sheet_webapp_url";
+let googleSheetWebAppUrl = googleSheetWebAppUrlDefault;
+localStorage.setItem(googleSheetWebAppUrlKey, googleSheetWebAppUrlDefault);
+
+
+
+const fileInput = document.getElementById("proof");
+const fileText = document.getElementById("fileText");
+let proofDataUrl = "";
+const maxPreviewWidth = 1200;
+const jpegQuality = 0.75;
+
+fileInput.addEventListener("change", async () => {
+  if (fileInput.files.length > 0) {
+    fileText.innerText = fileInput.files[0].name;
+    fileText.parentElement.classList.add("active");
+    setStatus("Processing screenshot...", "");
+    try {
+      proofDataUrl = await compressImageFile(fileInput.files[0]);
+      previewImg.src = proofDataUrl;
+      filePreview.classList.add("visible");
+      setStatus("Screenshot ready to submit.", "success");
+    } catch (error) {
+      console.error(error);
+      proofDataUrl = "";
+      previewImg.removeAttribute("src");
+      filePreview.classList.remove("visible");
+      setStatus("Could not process screenshot. Please try another image.", "error");
+    }
+  } else {
+    proofDataUrl = "";
+    previewImg.removeAttribute("src");
+    filePreview.classList.remove("visible");
+  }
+});
+
+fileInput.addEventListener("click", () => {
+  fileInput.value = "";
+  proofDataUrl = "";
+  previewImg.removeAttribute("src");
+  filePreview.classList.remove("visible");
+});
+// Update price + QR
+function updatePayment(){
+  let count = parseInt(tickets.value);
+  let amount = count * pricePerTicket;
+
+  total.innerText = `Total: ₹${amount}`;
+
+  let upi = `upi://pay?pa=yourupi@okaxis&pn=Event&am=${amount}&cu=INR`;
+
+  qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(upi)}`;
+
+  payBtn.onclick = () => window.location.href = upi;
+}
+
+tickets.addEventListener("change", updatePayment);
+updatePayment();
+
+// Submit
+document.getElementById("form").addEventListener("submit", async (e)=>{
+  e.preventDefault();
+
+  if (!proof.files.length || !proofDataUrl) {
+    setStatus("Please upload payment screenshot before submitting.", "error");
+    return;
+  }
+
+  const entry = {
+    timestamp: new Date().toISOString(),
+    name: document.getElementById("name").value.trim(),
+    phone: document.getElementById("phone").value.trim(),
+    email: document.getElementById("email").value.trim(),
+    food: document.querySelector('input[name="food"]:checked').value,
+    tickets: tickets.value,
+    amount: tickets.value * pricePerTicket,
+    image: proof.files[0]?.name || "uploaded",
+    proofUrl: proofDataUrl
+  };
+
+  try {
+    await postToGoogleSheet(entry);
+    setStatus("Registered successfully.", "success");
+    alert("Registered Successfully!");
+    resetForm();
+  } catch (error) {
+    console.error(error);
+    setStatus("Could not save to Google Sheet. Check the web app URL and deployment.", "error");
+  }
+});
+
+// CSV
+function downloadCSV(){
+  if (!ensureGoogleSheetUrlConfigured()) {
+    return;
+  }
+
+  window.open(`${googleSheetWebAppUrl}?format=csv`, "_blank", "noopener,noreferrer");
+}
+
+async function postToGoogleSheet(entry){
+  if (!ensureGoogleSheetUrlConfigured()) {
+    throw new Error("Google Apps Script web app URL is missing or invalid");
+  }
+
+  const response = await fetch(googleSheetWebAppUrl, {
+    method: "POST",
+    mode: "no-cors",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
+    },
+    body: new URLSearchParams(entry).toString()
+  });
+
+  return response;
+}
+
+function compressImageFile(file){
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("Could not read image file"));
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error("Could not load image for compression"));
+      img.onload = () => {
+        const scale = Math.min(1, maxPreviewWidth / img.width);
+        const targetWidth = Math.max(1, Math.round(img.width * scale));
+        const targetHeight = Math.max(1, Math.round(img.height * scale));
+
+        const canvas = document.createElement("canvas");
+        canvas.width = targetWidth;
+        canvas.height = targetHeight;
+
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          reject(new Error("Canvas context unavailable"));
+          return;
+        }
+
+        ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+        resolve(canvas.toDataURL("image/jpeg", jpegQuality));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function ensureGoogleSheetUrlConfigured(){
+  const hasPlaceholder = !googleSheetWebAppUrl || googleSheetWebAppUrl.includes("PASTE_YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE");
+  const hasInvalidUrl = googleSheetWebAppUrl && !isGoogleScriptExecUrl(googleSheetWebAppUrl);
+
+  if (!hasPlaceholder && !hasInvalidUrl) {
+    return true;
+  }
+
+  const promptText = hasInvalidUrl
+    ? "The saved Apps Script URL is invalid. Paste a URL like https://script.google.com/macros/s/.../exec"
+    : "Paste your deployed Google Apps Script Web App URL (ends with /exec)";
+
+  const entered = window.prompt(promptText, hasInvalidUrl ? googleSheetWebAppUrl : "");
+  if (!entered) {
+    setStatus("Google Sheet URL is required to submit.", "error");
+    return false;
+  }
+
+  const cleaned = entered.trim();
+  if (!isGoogleScriptExecUrl(cleaned)) {
+    setStatus("Invalid URL. Use the deployed Apps Script web app URL ending with /exec.", "error");
+    return false;
+  }
+
+  googleSheetWebAppUrl = cleaned;
+  localStorage.setItem(googleSheetWebAppUrlKey, cleaned);
+  setStatus("Google Sheet endpoint configured.", "success");
+  return true;
+}
+
+function isGoogleScriptExecUrl(url){
+  return /^https:\/\/script\.google\.com\/macros\/s\/.+\/exec(?:\?.*)?$/i.test(url);
+}
+
+function resetForm(){
+  document.getElementById("form").reset();
+  proofDataUrl = "";
+  fileText.innerText = "Upload Payment Screenshot";
+  fileText.parentElement.classList.remove("active");
+  previewImg.removeAttribute("src");
+  filePreview.classList.remove("visible");
+  fileInput.value = "";
+  updatePayment();
+}
+
+function setStatus(message, kind){
+  statusEl.textContent = message;
+  statusEl.className = `status ${kind || ""}`.trim();
+}
+
+</script>
+
+</body>
+</html>
